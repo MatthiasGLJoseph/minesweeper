@@ -11,8 +11,10 @@ class Minesweeper:
         self.cols = cols
         self.num_mines = num_mines
         self.board = [["" for _ in range(cols)] for _ in range(rows)]
+        self.maybe = set()
         self.mines = set()
         self.revealed = set()
+        self.status = "Continue"
         self.place_mines()
 
     def place_mines(self) -> None:
@@ -41,23 +43,30 @@ class Minesweeper:
         Any adjacent cells with no mines are also revealed.
         Returns "Game Over" if a mine is revealed, "Continue" otherwise.
         """
-        self.revealed.add((row, col))
+        if (row, col) not in self.revealed and self.status == "Continue":
+            self.revealed.add((row, col))
 
-        if (row, col) in self.mines:
-            return "Game Over"
+            if (row, col) in self.mines:
+                self.status = "Game Over"
 
-        if self.board[row][col] == "":
-            self.board[row][col] = 0
-            for r in range(row - 1, row + 2):
-                for c in range(col - 1, col + 2):
-                    if (
-                        0 <= r < self.rows
-                        and 0 <= c < self.cols
-                        and (r, c) not in self.revealed
-                    ):
-                        self.reveal(r, c)
+                for r in range(self.rows):
+                    for c in range(self.cols):
+                        if self.board[r][c] == "":
+                            self.board[r][c] = 0
 
-        return "Continue"
+            elif self.board[row][col] == "":
+                self.board[row][col] = 0
+
+                for r in range(row - 1, row + 2):
+                    for c in range(col - 1, col + 2):
+                        if (
+                            0 <= r < self.rows
+                            and 0 <= c < self.cols
+                            and (r, c) not in self.revealed
+                        ):
+                            self.reveal(r, c)
+
+        return self.status
 
     def get_board(self) -> list:
         """Return the current state of the board."""
@@ -71,7 +80,16 @@ class Minesweeper:
 
     def is_winner(self) -> bool:
         """Check if the game has been won."""
-        return len(self.revealed) == self.rows * self.cols - self.num_mines
+        for case in self.revealed:
+            if case in self.mines:
+                self.status = "Game Over"
+                return False
+
+        if len(self.revealed) == self.rows * self.cols - self.num_mines:
+            self.status = "Victory"
+            return True
+
+        return False
 
     def restart(self) -> None:
         """Restart the game with the same parameters."""
