@@ -1,0 +1,6 @@
+#Ignore at root
+.pytest_cache
+.python-version
+
+# Ignore folders
+*/__pycache__
