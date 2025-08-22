@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minesweeper</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script>
+    function handleRightClick (ev, row, col) {
+      ev.preventDefault();
+      window.open(
+        "{{ url_for('select', row=100, col=200) }}".replace("100", row).replace("200", col),
+        "_self"
+      );
+    }
+  </script>
 </head>
 
 <body>
@@ -17,9 +26,9 @@
       {% for row_idx in range(board|length) %}
       <tr>
         {% for col_idx in range(board[row_idx]|length) %}
-        <td class="{{ 'revealed' if board[row_idx][col_idx] != ' ' else 'hidden' }}">
+        <td class="{{ 'revealed' if board[row_idx][col_idx] != ' ' else 'hidden' }}{{ ' selected' if (row_idx, col_idx) in maybe else '' }}">
           {% if board[row_idx][col_idx] == ' ' %}
-          <a href="{{ url_for('reveal', row=row_idx, col=col_idx) }}">?</a>
+          <a oncontextmenu='handleRightClick(event, "{{ row_idx }}", "{{ col_idx }}")' href="{{ url_for('reveal', row=row_idx, col=col_idx) }}">?</a>
           {% else %}
           {{ board[row_idx][col_idx] }}
           {% endif %}

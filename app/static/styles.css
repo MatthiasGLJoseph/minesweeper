@@ -53,6 +53,7 @@ table {
 td {
   width: 40px;
   height: 40px;
+  line-height: 40px;
   text-align: center;
   vertical-align: middle;
   font-size: 1.5rem;
@@ -70,6 +71,11 @@ td {
 .revealed {
   background-color: #fff;
   color: #333;
+}
+
+.selected {
+  background-color: #999;
+  color: #ddd
 }
 
 .revealed:hover,

@@ -10,7 +10,7 @@ class Minesweeper:
         self.rows = rows
         self.cols = cols
         self.num_mines = num_mines
-        self.board = [["" for _ in range(cols)] for _ in range(rows)]
+        self.board = [[" " for _ in range(cols)] for _ in range(rows)]
         self.maybe = set()
         self.mines = set()
         self.revealed = set()
@@ -33,10 +33,22 @@ class Minesweeper:
                         and 0 <= j < self.cols
                         and self.board[i][j] != "💣"
                     ):
-                        if self.board[i][j] == "":
+                        if self.board[i][j] == " ":
                             self.board[i][j] = 1
                         else:
                             self.board[i][j] += 1
+
+    def select(self, row: int, col: int) -> None:
+        """Select a cell on the board.
+        It will be marked as a potential mine and
+        you will no longer be able to reveal it.
+        """
+        if (row, col) not in self.revealed and self.status == "Continue":
+            if (row, col) in self.maybe:
+                self.maybe.remove((row, col))
+
+            else:
+                self.maybe.add((row, col))
 
     def reveal(self, row: int, col: int) -> str:
         """Reveal a cell on the board.
@@ -45,17 +57,20 @@ class Minesweeper:
         """
         if (row, col) not in self.revealed and self.status == "Continue":
             self.revealed.add((row, col))
-
             if (row, col) in self.mines:
                 self.status = "Game Over"
 
                 for r in range(self.rows):
                     for c in range(self.cols):
-                        if self.board[r][c] == "":
+                        if self.board[r][c] == " ":
                             self.board[r][c] = 0
 
-            elif self.board[row][col] == "":
+            elif self.board[row][col] == " ":
+                self.revealed.add((row, col))
                 self.board[row][col] = 0
+
+                if (row, col) in self.maybe:
+                    self.maybe.remove((row, col))
 
                 for r in range(row - 1, row + 2):
                     for c in range(col - 1, col + 2):
